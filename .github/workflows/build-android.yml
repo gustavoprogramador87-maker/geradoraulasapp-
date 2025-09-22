@@ -2,9 +2,9 @@ name: 🚀 Build Android APK
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, master ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
     inputs:
       build_type:
@@ -29,7 +29,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
         
     - name: ☕ Setup Java JDK
       uses: actions/setup-java@v4
@@ -42,14 +41,35 @@ jobs:
       
     - name: 📦 Install Dependencies
       run: |
-        npm ci
+        # Check if lock file exists, use appropriate install command
+        if [ -f "package-lock.json" ]; then
+          echo "📋 Using package-lock.json..."
+          npm ci
+        else
+          echo "📦 No lock file found, using npm install..."
+          npm install
+        fi
         npm install -g @capacitor/cli
         
-    - name: 🎨 Generate Icons
+    - name: 🎨 Generate Icons (Placeholder)
       run: |
         mkdir -p icons
-        # Create placeholder icons (in real scenario, you'd generate from SVG)
-        echo "Creating placeholder icons for CI/CD..."
+        # Create basic placeholder icons for CI/CD
+        echo "📱 Creating placeholder icons for build..."
+        
+        # Create simple colored squares as placeholder icons
+        for size in 72 96 128 144 152 192 384 512; do
+          # Create a simple SVG and convert to "PNG" (base64 data URI for CI)
+          echo "Creating ${size}x${size} icon..."
+          cat > "icons/icon-${size}.png.placeholder" << EOF
+        <!-- Placeholder for ${size}x${size} icon -->
+        <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+          <rect width="${size}" height="${size}" fill="#2c5aa0"/>
+          <circle cx="$((size/2))" cy="$((size/2))" r="$((size/4))" fill="white"/>
+          <text x="$((size/2))" y="$((size/2+8))" text-anchor="middle" fill="white" font-size="$((size/8))">IA</text>
+        </svg>
+        EOF
+        done
         
     - name: 🔧 Initialize Capacitor
       run: |
@@ -122,21 +142,22 @@ jobs:
           echo "🔍 Analisando APK: $(basename "$APK_FILE")"
           
           # Verificar tamanho do APK
-          SIZE=$(stat -f%z "$APK_FILE" 2>/dev/null || stat -c%s "$APK_FILE")
+          SIZE=$(stat -c%s "$APK_FILE" 2>/dev/null || stat -f%z "$APK_FILE" 2>/dev/null || echo "0")
           SIZE_MB=$((SIZE / 1024 / 1024))
           
           echo "📏 Tamanho do APK: ${SIZE_MB}MB"
           
           if [ $SIZE_MB -gt 100 ]; then
-            echo "⚠️ APK muito grande (>${SIZE_MB}MB). Considere otimizações."
+            echo "⚠️ APK muito grande (${SIZE_MB}MB). Considere otimizações."
           else
             echo "✅ Tamanho do APK adequado (${SIZE_MB}MB)"
           fi
           
-          # Verificar estrutura básica
-          if command -v aapt >/dev/null 2>&1; then
-            echo "📋 Informações do APK:"
-            aapt dump badging "$APK_FILE" | head -10
+          # Verificar se o APK é válido
+          if file "$APK_FILE" | grep -q "Zip archive"; then
+            echo "✅ APK é um arquivo ZIP válido"
+          else
+            echo "⚠️ APK pode não ser válido"
           fi
         else
           echo "❌ APK não encontrado para análise!"
