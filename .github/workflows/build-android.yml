@@ -30,6 +30,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+        cache: 'npm'
         
     - name: ☕ Setup Java JDK
       uses: actions/setup-java@v4
@@ -50,17 +51,23 @@ jobs:
           echo "📦 No lock file found, using npm install..."
           npm install
         fi
-        npm install -g @capacitor/cli
+        
+        # Install TypeScript and Capacitor CLI globally
+        npm install -g @capacitor/cli typescript
+        
+        # Install TypeScript as dev dependency if not present
+        if ! npm list typescript > /dev/null 2>&1; then
+          echo "📝 Installing TypeScript as dev dependency..."
+          npm install -D typescript
+        fi
         
     - name: 🎨 Generate Icons (Placeholder)
       run: |
         mkdir -p icons
-        # Create basic placeholder icons for CI/CD
         echo "📱 Creating placeholder icons for build..."
         
         # Create simple colored squares as placeholder icons
         for size in 72 96 128 144 152 192 384 512; do
-          # Create a simple SVG and convert to "PNG" (base64 data URI for CI)
           echo "Creating ${size}x${size} icon..."
           cat > "icons/icon-${size}.png.placeholder" << EOF
         <!-- Placeholder for ${size}x${size} icon -->
@@ -72,23 +79,70 @@ jobs:
         EOF
         done
         
+    - name: 🔧 Check Capacitor Config
+      run: |
+        # Check if capacitor.config.ts exists and is valid
+        if [ -f "capacitor.config.ts" ]; then
+          echo "✅ Found capacitor.config.ts"
+          # Validate TypeScript syntax
+          npx tsc --noEmit capacitor.config.ts || echo "⚠️ TypeScript validation failed, but continuing..."
+        else
+          echo "📝 Creating capacitor.config.ts..."
+          cat > capacitor.config.ts << 'EOF'
+        import { CapacitorConfig } from '@capacitor/cli';
+
+        const config: CapacitorConfig = {
+          appId: 'com.gugamilani940.geradoraulas',
+          appName: 'Gerador de Aulas Científicas',
+          webDir: '.',
+          server: {
+            androidScheme: 'https'
+          },
+          android: {
+            allowMixedContent: true
+          }
+        };
+
+        export default config;
+        EOF
+        fi
+        
     - name: 🔧 Initialize Capacitor
       run: |
-        npx cap init "Gerador de Aulas Científicas" "com.gugamilani940.geradoraulas" --web-dir="."
+        # Initialize Capacitor with the existing config
+        if [ -f "capacitor.config.ts" ]; then
+          echo "📋 Using existing Capacitor configuration..."
+          npx cap sync --no-build
+        else
+          echo "🆕 Initializing new Capacitor project..."
+          npx cap init "Gerador de Aulas Científicas" "com.gugamilani940.geradoraulas" --web-dir="."
+        fi
         
     - name: 📱 Add Android Platform
       run: |
-        npx cap add android
+        # Check if android platform already exists
+        if [ ! -d "android" ]; then
+          echo "📱 Adding Android platform..."
+          npx cap add android
+        else
+          echo "✅ Android platform already exists"
+        fi
         
     - name: 🔄 Sync Capacitor
       run: |
+        echo "🔄 Syncing Capacitor..."
         npx cap sync android
         
     - name: 🏗️ Build Android APK
       working-directory: ./android
       run: |
         chmod +x ./gradlew
-        if [ "${{ github.event.inputs.build_type }}" == "release" ]; then
+        
+        # Set build type based on input or default to debug
+        BUILD_TYPE="${{ github.event.inputs.build_type || 'debug' }}"
+        echo "🏗️ Building APK with type: $BUILD_TYPE"
+        
+        if [ "$BUILD_TYPE" == "release" ]; then
           ./gradlew assembleRelease
         else
           ./gradlew assembleDebug
@@ -96,7 +150,8 @@ jobs:
         
     - name: 📋 List APK Files
       run: |
-        find android/app/build/outputs/apk -name "*.apk" -type f
+        echo "📋 Listing generated APK files..."
+        find android/app/build/outputs/apk -name "*.apk" -type f -exec ls -lh {} \;
         
     - name: 📤 Upload APK Artifact
       uses: actions/upload-artifact@v4
@@ -115,6 +170,16 @@ jobs:
           echo "📁 Caminho: $APK_PATH"
           echo "📏 Tamanho: $(du -h "$APK_PATH" | cut -f1)"
           echo "🏷️ Nome: $(basename "$APK_PATH")"
+          
+          # Add to GitHub summary
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+        ## 📱 APK Build Success
+        
+        **✅ APK Generated Successfully!**
+        - **Path:** \`$APK_PATH\`
+        - **Size:** \`$(du -h "$APK_PATH" | cut -f1)\`
+        - **Name:** \`$(basename "$APK_PATH")\`
+        EOF
         else
           echo "❌ APK não encontrado!"
           exit 1
@@ -160,6 +225,17 @@ jobs:
           else
             echo "⚠️ APK pode não ser válido"
           fi
+          
+          # Add analysis to GitHub summary
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+        ## 🧪 APK Quality Analysis
+        
+        **📊 Analysis Results:**
+        - **File:** \`$(basename "$APK_FILE")\`
+        - **Size:** \`${SIZE_MB}MB\`
+        - **Status:** $([ $SIZE_MB -le 100 ] && echo "✅ Optimal size" || echo "⚠️ Large size")
+        - **Format:** $(file "$APK_FILE" | grep -q "Zip archive" && echo "✅ Valid APK" || echo "⚠️ Invalid format")
+        EOF
         else
           echo "❌ APK não encontrado para análise!"
           exit 1
