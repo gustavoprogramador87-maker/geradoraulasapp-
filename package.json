@@ -4,7 +4,7 @@
   "description": "Aplicativo para geração de aulas científicas a partir de PDFs com IA integrada",
   "main": "index.html",
   "scripts": {
-    "build": "echo 'Build completed - PWA ready'",
+    "build": "build-www.bat",
     "serve": "npx http-server . -p 8080",
     "cap:init": "npx cap init",
     "cap:add:android": "npx cap add android",
