@@ -112,7 +112,7 @@ jobs:
         # Initialize Capacitor with the existing config
         if [ -f "capacitor.config.ts" ]; then
           echo "📋 Using existing Capacitor configuration..."
-          npx cap sync --no-build
+          npx cap sync 
         else
           echo "🆕 Initializing new Capacitor project..."
           npx cap init "Gerador de Aulas Científicas" "com.gugamilani940.geradoraulas" --web-dir="."
