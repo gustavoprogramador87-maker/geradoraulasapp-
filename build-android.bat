@@ -1,10 +1,10 @@
 @echo off
-echo ====================================
-echo  Gerador de Aulas - Build Android
-echo ====================================
+chcp 65001 >nul
+echo 🚀 Iniciando build do Android...
 echo.
 
-REM Verificar se Node.js está instalado
+REM Verificar Node.js
+echo 🔍 Verificando Node.js...
 node --version >nul 2>&1
 if errorlevel 1 (
     echo ❌ Node.js não encontrado! Instale Node.js primeiro.
@@ -12,51 +12,80 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
+echo ✅ Node.js encontrado
 
-REM Verificar se Android Studio está instalado
-if not exist "%ANDROID_HOME%" (
-    echo ⚠️  ANDROID_HOME não configurado!
-    echo 📱 Instale Android Studio e configure as variáveis de ambiente:
-    echo    - ANDROID_HOME
-    echo    - JAVA_HOME
-    echo.
-    echo 📥 Download Android Studio: https://developer.android.com/studio
+REM Verificar se existe package.json
+if not exist "package.json" (
+    echo ❌ package.json não encontrado!
+    echo 📁 Execute este script na pasta raiz do projeto
     pause
+    exit /b 1
 )
 
+REM Instalar dependências
 echo 📦 Instalando dependências...
-call npm install
+if exist "package-lock.json" (
+    npm ci
+) else (
+    npm install
+)
 if errorlevel 1 (
     echo ❌ Erro ao instalar dependências!
     pause
     exit /b 1
 )
 
-echo 🎨 Gerando ícones PNG...
-if exist "create-icons.html" (
-    echo ℹ️  Abra create-icons.html no navegador para gerar os ícones PNG
-    echo    e salve-os na pasta icons/
-    pause
-)
-
-echo 🔧 Inicializando Capacitor...
-call npx cap init "Gerador de Aulas Científicas" "com.gugamilani940.geradoraulas" --web-dir="."
+REM Build do projeto
+echo 🔨 Fazendo build do projeto...
+npm run build
 if errorlevel 1 (
-    echo ❌ Erro ao inicializar Capacitor!
+    echo ❌ Erro no build do projeto!
     pause
     exit /b 1
 )
 
-echo 📱 Adicionando plataforma Android...
-call npx cap add android
+REM Verificar se Capacitor está instalado
+echo 🔍 Verificando Capacitor...
+npx cap --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Erro ao adicionar plataforma Android!
-    pause
-    exit /b 1
+    echo 📱 Instalando Capacitor CLI...
+    npm install -g @capacitor/cli
 )
 
+REM Inicializar Capacitor se necessário
+if not exist "capacitor.config.ts" (
+    echo 🎯 Inicializando Capacitor...
+    npx cap init "Gerador de Aulas" "com.gerador.aulas"
+    if errorlevel 1 (
+        echo ❌ Erro ao inicializar Capacitor!
+        pause
+        exit /b 1
+    )
+)
+
+REM Adicionar plataforma Android se necessário
+if not exist "android" (
+    echo 📱 Adicionando plataforma Android...
+    npx cap add android
+    if errorlevel 1 (
+        echo ❌ Erro ao adicionar plataforma Android!
+        pause
+        exit /b 1
+    )
+)
+
+REM Gerar ícones se necessário
+if not exist "android\app\src\main\res\mipmap-hdpi\ic_launcher.png" (
+    echo 🎨 Gerando ícones PNG...
+    echo ⚠️  Abra create-icons.html no navegador para gerar os ícones
+    echo    Depois execute este script novamente
+    pause
+    exit /b 0
+)
+
+REM Sincronizar arquivos
 echo 🔄 Sincronizando arquivos...
-call npx cap sync
+npx cap sync android
 if errorlevel 1 (
     echo ❌ Erro ao sincronizar!
     pause
@@ -64,24 +93,8 @@ if errorlevel 1 (
 )
 
 echo.
-echo ✅ Configuração concluída!
-echo.
-echo 📱 Próximos passos:
-echo    1. Execute: npx cap open android
-echo    2. No Android Studio, clique em "Build" > "Build Bundle(s) / APK(s)" > "Build APK(s)"
-echo    3. O APK será gerado em: android/app/build/outputs/apk/debug/
-echo.
-echo 🚀 Para abrir Android Studio agora, pressione qualquer tecla...
-pause
-
-echo 🎯 Abrindo Android Studio...
-call npx cap open android
-
-echo.
-echo 📋 Instruções finais:
-echo    - Conecte seu Samsung S22 Ultra via USB
-echo    - Ative "Depuração USB" nas opções de desenvolvedor
-echo    - No Android Studio, clique no botão "Run" para instalar no dispositivo
-echo    - Ou gere o APK e transfira manualmente para o celular
+echo ✅ Build concluído com sucesso!
+echo 📱 Para abrir no Android Studio: npx cap open android
+echo 🔨 Para build via linha de comando: cd android && gradlew assembleDebug
 echo.
 pause

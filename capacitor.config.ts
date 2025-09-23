@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.gugamilani940.geradoraulas',
-  appName: 'Gerador de Aulas Científicas',
+  appId: 'com.gerador.aulas',
+  appName: 'Gerador de Aulas',
   webDir: '.',
   server: {
     androidScheme: 'https'
@@ -10,39 +10,16 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: true,
     captureInput: true,
-    webContentsDebuggingEnabled: true,
-    loggingBehavior: 'debug'
+    webContentsDebuggingEnabled: true
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
-      launchAutoHide: true,
       backgroundColor: "#2c5aa0",
-      androidSplashResourceName: "splash",
-      androidScaleType: "CENTER_CROP",
-      showSpinner: false,
-      splashFullScreen: true,
-      splashImmersive: true
-    },
-    StatusBar: {
-      style: 'DARK',
-      backgroundColor: '#2c5aa0'
+      showSpinner: false
     },
     Filesystem: {
-      iosDocumentPath: 'DOCUMENTS',
-      androidExternalStoragePublicDirectory: 'DOWNLOADS'
-    },
-    Haptics: {
-      enabled: true
-    },
-    Device: {
-      enabled: true
-    },
-    Network: {
-      enabled: true
-    },
-    App: {
-      enabled: true
+      ioTimeout: 30000
     }
   }
 };
