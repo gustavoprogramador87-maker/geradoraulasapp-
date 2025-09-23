@@ -2,8 +2,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.gugamilani940.geradoraulas',
-  appName: 'Gerador de Aulas Científicas',
+  appId: 'com.gerador.aulas',
+  appName: 'GeradorAulas',
   webDir: '.',
   bundledWebRuntime: false,
   server: {

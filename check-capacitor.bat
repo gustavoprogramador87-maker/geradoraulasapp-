@@ -3,12 +3,17 @@ echo 🔍 VERIFICAÇÃO ESPECÍFICA DO CAPACITOR
 echo =====================================
 echo.
 
-echo 📋 Verificando instalação do Capacitor...
+echo 📋 Verificando versão do Capacitor...
 npx cap --version
 if errorlevel 1 (
     echo ❌ Capacitor CLI não encontrado!
-    echo 📦 Instalando...
-    npm install -g @capacitor/cli
+    echo 📦 Instalando versão mais recente...
+    npm install -g @capacitor/cli@latest
+    if errorlevel 1 (
+        echo ❌ Erro ao instalar Capacitor CLI!
+        pause
+        exit /b 1
+    )
 )
 
 echo 📋 Verificando configuração...
@@ -30,45 +35,32 @@ if exist "index.html" (echo ✅ index.html) else (echo ❌ index.html FALTANDO!)
 if exist "manifest.json" (echo ✅ manifest.json) else (echo ⚠️ manifest.json não encontrado)
 
 echo.
-echo 🔍 2. Verificando dependências do Capacitor...
-npm list @capacitor/core 2>nul
-if errorlevel 1 (
-    echo ❌ @capacitor/core não instalado!
-    echo 📦 Instalando dependências necessárias...
-    npm install @capacitor/core @capacitor/cli @capacitor/android
-    if errorlevel 1 (
-        echo ❌ ERRO: Falha ao instalar dependências do Capacitor!
-        echo 💡 Tente: npm cache clean --force
-        pause
-        exit /b 1
-    )
-) else (
-    echo ✅ @capacitor/core instalado
-)
+echo 🔍 2. Atualizando Capacitor para versão mais recente...
+npm uninstall -g @capacitor/cli
+npm install -g @capacitor/cli@latest
+npm install @capacitor/core@latest @capacitor/android@latest --save
 
 echo.
-echo 🔍 3. Testando inicialização do Capacitor...
+echo 🔍 3. Verificando versão atualizada...
+npx cap --version
+
+echo.
+echo 🔍 4. Testando inicialização do Capacitor (SEM --no-build)...
 if exist "capacitor.config.ts" (
     echo ⚠️ Capacitor já inicializado, removendo para teste...
     del "capacitor.config.ts" 2>nul
     if exist "android" rmdir /s /q "android" 2>nul
 )
 
-echo 🎯 Tentando inicializar Capacitor...
-echo Comando: npx cap init "Gerador de Aulas" "com.gugamilani940.geradoraulas" --web-dir="."
-npx cap init "Gerador de Aulas" "com.gugamilani940.geradoraulas" --web-dir="." 2>&1
+echo 🎯 Tentando inicializar Capacitor (versão compatível)...
+echo Comando: npx cap init "Gerador de Aulas" "com.gugamilani940.geradoraulas"
+npx cap init "Gerador de Aulas" "com.gugamilani940.geradoraulas" 2>&1
 if errorlevel 1 (
     echo.
     echo ❌ ERRO NA INICIALIZAÇÃO DO CAPACITOR!
     echo.
-    echo 🔧 POSSÍVEIS SOLUÇÕES:
-    echo 1. Verificar se o nome do app tem caracteres especiais
-    echo 2. Verificar se o appId está no formato correto
-    echo 3. Verificar permissões da pasta
-    echo 4. Limpar cache do npm
-    echo.
     echo 🧪 Tentando com configuração mais simples...
-    npx cap init "GeradorAulas" "com.gerador.aulas" --web-dir="." 2>&1
+    npx cap init "GeradorAulas" "com.gerador.aulas" 2>&1
     if errorlevel 1 (
         echo ❌ Falha mesmo com configuração simples!
         echo.
@@ -79,8 +71,10 @@ if errorlevel 1 (
         node --version
         echo NPM version:
         npm --version
+        echo Capacitor version:
+        npx cap --version
         echo.
-        echo 💡 Tente executar como administrador ou verificar antivírus
+        echo 💡 Tente executar como administrador
         pause
         exit /b 1
     ) else (
@@ -88,6 +82,15 @@ if errorlevel 1 (
     )
 ) else (
     echo ✅ Capacitor inicializado com sucesso!
+)
+
+echo.
+echo 🔧 Configurando webDir manualmente...
+if exist "capacitor.config.ts" (
+    echo Atualizando capacitor.config.ts para webDir: "."
+    powershell -Command "(Get-Content capacitor.config.ts) -replace 'webDir: ''www''', 'webDir: ''.''' | Set-Content capacitor.config.ts"
+    powershell -Command "(Get-Content capacitor.config.ts) -replace 'webDir: ''build''', 'webDir: ''.''' | Set-Content capacitor.config.ts"
+    powershell -Command "(Get-Content capacitor.config.ts) -replace 'webDir: ''dist''', 'webDir: ''.''' | Set-Content capacitor.config.ts"
 )
 
 echo.
@@ -113,6 +116,10 @@ if errorlevel 1 (
         echo 📱 Instale Android Studio e configure as variáveis:
         echo    - ANDROID_HOME = C:\Users\%USERNAME%\AppData\Local\Android\Sdk
         echo    - JAVA_HOME = C:\Program Files\Android\Android Studio\jre
+        echo.
+        echo 🔧 Para configurar automaticamente, execute:
+        echo setx ANDROID_HOME "C:\Users\%USERNAME%\AppData\Local\Android\Sdk"
+        echo setx JAVA_HOME "C:\Program Files\Android\Android Studio\jre"
     )
 ) else (
     echo ✅ Plataforma Android adicionada com sucesso!
@@ -123,5 +130,11 @@ echo 📋 RESUMO DO DIAGNÓSTICO:
 echo ========================
 if exist "capacitor.config.ts" (echo ✅ Capacitor configurado) else (echo ❌ Capacitor NÃO configurado)
 if exist "android" (echo ✅ Plataforma Android adicionada) else (echo ❌ Plataforma Android NÃO adicionada)
+
+echo.
+echo 🔧 PRÓXIMOS PASSOS RECOMENDADOS:
+echo 1. Se tudo estiver ✅, execute: npx cap sync
+echo 2. Para abrir no Android Studio: npx cap open android
+echo 3. Para build: cd android ^&^& gradlew assembleDebug
 
 pause
