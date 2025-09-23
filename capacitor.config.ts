@@ -1,11 +1,9 @@
-
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.gerador.aulas',
   appName: 'GeradorAulas',
-  webDir: '.',
-  bundledWebRuntime: false,
+  webDir: 'www',
   server: {
     androidScheme: 'https',
     allowNavigation: [
