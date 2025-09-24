@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Ícones PNG</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .icon-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .icon-item img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            background: #2c5aa0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #1e3f73;
+        }
+        #status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Gerador de Ícones PNG para Android</h1>
+        <p>Esta ferramenta converte os ícones SVG em PNG nos tamanhos necessários para o Android APK.</p>
+        
+        <div style="margin: 20px 0;">
+            <button class="btn" onclick="generateAllIcons()">🚀 Gerar Todos os Ícones PNG</button>
+            <button class="btn" onclick="downloadAllIcons()" style="background: #27ae60;">💾 Baixar Todos os Ícones</button>
+        </div>
+        
+        <div id="status"></div>
+        
+        <div class="icon-preview" id="iconPreview"></div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 8px;">
+            <h3>📱 Tamanhos de Ícones para Android:</h3>
+            <ul>
+                <li><strong>72x72</strong> - LDPI (Low Density)</li>
+                <li><strong>96x96</strong> - MDPI (Medium Density)</li>
+                <li><strong>128x128</strong> - Launcher icon</li>
+                <li><strong>144x144</strong> - HDPI (High Density)</li>
+                <li><strong>152x152</strong> - iOS compatibility</li>
+                <li><strong>192x192</strong> - XXHDPI (Extra Extra High Density)</li>
+                <li><strong>384x384</strong> - XXXHDPI (Extra Extra Extra High Density)</li>
+                <li><strong>512x512</strong> - Google Play Store</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const iconSizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const generatedIcons = new Map();
+        
+        // SVG do ícone principal (baseado no tema científico)
+        const svgIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+            <!-- Fundo gradiente -->
+            <defs>
+                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#2c5aa0;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#34495e;stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#ecf0f1;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            
+            <!-- Fundo principal -->
+            <rect width="512" height="512" rx="80" ry="80" fill="url(#bgGradient)"/>
+            
+            <!-- Molécula central -->
+            <g transform="translate(256,256)" fill="url(#iconGradient)">
+                <!-- Átomo central -->
+                <circle cx="0" cy="0" r="25" fill="#ffffff"/>
+                
+                <!-- Átomos ao redor -->
+                <circle cx="-60" cy="-60" r="18" fill="#e74c3c"/>
+                <circle cx="60" cy="-60" r="18" fill="#27ae60"/>
+                <circle cx="-60" cy="60" r="18" fill="#f39c12"/>
+                <circle cx="60" cy="60" r="18" fill="#9b59b6"/>
+                
+                <!-- Ligações -->
+                <line x1="0" y1="0" x2="-60" y2="-60" stroke="#ffffff" stroke-width="4"/>
+                <line x1="0" y1="0" x2="60" y2="-60" stroke="#ffffff" stroke-width="4"/>
+                <line x1="0" y1="0" x2="-60" y2="60" stroke="#ffffff" stroke-width="4"/>
+                <line x1="0" y1="0" x2="60" y2="60" stroke="#ffffff" stroke-width="4"/>
+                
+                <!-- Órbitas eletrônicas -->
+                <circle cx="0" cy="0" r="80" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+                <ellipse cx="0" cy="0" rx="80" ry="40" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5" transform="rotate(45)"/>
+                <ellipse cx="0" cy="0" rx="80" ry="40" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5" transform="rotate(-45)"/>
+            </g>
+            
+            <!-- Símbolo de educação -->
+            <g transform="translate(256,400)" fill="#ffffff">
+                <path d="M-40,-20 L40,-20 L35,-10 L-35,-10 Z" opacity="0.8"/>
+                <path d="M-30,-10 L30,-10 L25,0 L-25,0 Z" opacity="0.6"/>
+                <path d="M-20,0 L20,0 L15,10 L-15,10 Z" opacity="0.4"/>
+            </g>
+            
+            <!-- Texto "IA" -->
+            <text x="256" y="450" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
+                  text-anchor="middle" fill="#ffffff" opacity="0.9">IA</text>
+        </svg>`;
+        
+        async function generateAllIcons() {
+            showStatus('Gerando ícones PNG...', 'info');
+            const preview = document.getElementById('iconPreview');
+            preview.innerHTML = '';
+            generatedIcons.clear();
+            
+            try {
+                for (const size of iconSizes) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = size;
+                    canvas.height = size;
+                    
+                    // Criar imagem SVG
+                    const img = new Image();
+                    const svgBlob = new Blob([svgIcon], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(svgBlob);
+                    
+                    await new Promise((resolve) => {
+                        img.onload = () => {
+                            ctx.drawImage(img, 0, 0, size, size);
+                            
+                            // Converter para PNG
+                            canvas.toBlob((blob) => {
+                                generatedIcons.set(size, blob);
+                                
+                                // Mostrar preview
+                                const iconItem = document.createElement('div');
+                                iconItem.className = 'icon-item';
+                                iconItem.innerHTML = `
+                                    <img src="${canvas.toDataURL()}" alt="Icon ${size}x${size}">
+                                    <div><strong>${size}x${size}</strong></div>
+                                    <button class="btn" onclick="downloadIcon(${size})" style="font-size: 12px; padding: 6px 12px;">
+                                        💾 Baixar
+                                    </button>
+                                `;
+                                preview.appendChild(iconItem);
+                                
+                                URL.revokeObjectURL(url);
+                                resolve();
+                            }, 'image/png');
+                        };
+                        img.src = url;
+                    });
+                }
+                
+                showStatus('✅ Todos os ícones foram gerados com sucesso!', 'success');
+            } catch (error) {
+                showStatus('❌ Erro ao gerar ícones: ' + error.message, 'error');
+            }
+        }
+        
+        function downloadIcon(size) {
+            const blob = generatedIcons.get(size);
+            if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `icon-${size}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        function downloadAllIcons() {
+            if (generatedIcons.size === 0) {
+                showStatus('⚠️ Gere os ícones primeiro!', 'error');
+                return;
+            }
+            
+            // Download individual de cada ícone
+            iconSizes.forEach(size => {
+                setTimeout(() => downloadIcon(size), size * 10); // Delay para evitar bloqueio
+            });
+            
+            showStatus('📥 Baixando todos os ícones...', 'success');
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = type;
+            status.style.display = 'block';
+            
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // Gerar ícones automaticamente ao carregar
+        window.addEventListener('load', () => {
+            setTimeout(generateAllIcons, 500);
+        });
+    </script>
+</body>
+</html>

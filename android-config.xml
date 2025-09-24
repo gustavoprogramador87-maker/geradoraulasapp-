@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <!-- Samsung S22 Ultra Specific Configurations -->
+    <string name="app_name">Gerador de Aulas Científicas</string>
+    <string name="title_activity_main">Gerador de Aulas Científicas</string>
+    <string name="package_name">com.gugamilani940.geradoraulas</string>
+    <string name="custom_url_scheme">geradoraulas</string>
+    
+    <!-- Display Configuration for Samsung S22 Ultra -->
+    <!-- Resolution: 3088x1440, 516 PPI, 6.8" Dynamic AMOLED 2X -->
+    <dimen name="status_bar_height">44dp</dimen>
+    <dimen name="navigation_bar_height">48dp</dimen>
+    
+    <!-- Theme Colors -->
+    <color name="colorPrimary">#2c5aa0</color>
+    <color name="colorPrimaryDark">#1e3f73</color>
+    <color name="colorAccent">#e74c3c</color>
+    <color name="statusBarColor">#2c5aa0</color>
+    <color name="navigationBarColor">#2c5aa0</color>
+    
+    <!-- Samsung One UI Optimizations -->
+    <bool name="show_loading_dialog">true</bool>
+    <bool name="splash_show_spinner">false</bool>
+    <integer name="splash_fade_out_duration">300</integer>
+    
+    <!-- File Access Permissions -->
+    <string-array name="allowed_navigation_hosts">
+        <item>api.openai.com</item>
+        <item>cdnjs.cloudflare.com</item>
+        <item>pt.wikipedia.org</item>
+        <item>pubmed.ncbi.nlm.nih.gov</item>
+    </string-array>
+    
+    <!-- Scientific App Features -->
+    <bool name="enable_pdf_processing">true</bool>
+    <bool name="enable_ai_integration">true</bool>
+    <bool name="enable_offline_mode">true</bool>
+    <bool name="enable_voice_synthesis">true</bool>
+    
+    <!-- Samsung DeX Support -->
+    <bool name="supports_dex_mode">true</bool>
+    <bool name="resize_on_dex">true</bool>
+    
+    <!-- Performance Optimizations -->
+    <bool name="hardware_acceleration">true</bool>
+    <bool name="webgl_enabled">true</bool>
+    <bool name="javascript_enabled">true</bool>
+    <bool name="dom_storage_enabled">true</bool>
+    <bool name="database_enabled">true</bool>
+    
+    <!-- Security Settings -->
+    <bool name="allow_mixed_content">true</bool>
+    <bool name="allow_universal_access_from_file_urls">false</bool>
+    <bool name="allow_file_access_from_file_urls">false</bool>
+</resources>

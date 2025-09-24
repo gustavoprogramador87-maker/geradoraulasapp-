@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">GeradorAulas</string>
+    <string name="title_activity_main">GeradorAulas</string>
+    <string name="package_name">com.gerador.aulas</string>
+    <string name="custom_url_scheme">com.gerador.aulas</string>
+</resources>

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
+  "name": "🧬 Gerador de Aulas - Android Development",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installMaven": false,
+      "installGradle": true
+    },
+    "ghcr.io/devcontainers/features/android-sdk:1": {
+      "cmdLineToolsVersion": "latest",
+      "platformVersion": "33",
+      "buildToolsVersion": "33.0.0"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-json",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "ms-vscode.vscode-eslint",
+        "ionic.ionic",
+        "vscjava.vscode-java-pack"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        "files.associations": {
+          "*.html": "html",
+          "*.js": "javascript",
+          "*.ts": "typescript",
+          "*.json": "json"
+        }
+      }
+    }
+  },
+
+  "forwardPorts": [8080, 8100, 3000],
+  "portsAttributes": {
+    "8080": {
+      "label": "PWA Server",
+      "onAutoForward": "notify"
+    },
+    "8100": {
+      "label": "Ionic Dev Server",
+      "onAutoForward": "notify"
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+
+  "remoteUser": "node",
+  
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ]
+}
