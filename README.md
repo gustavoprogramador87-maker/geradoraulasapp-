@@ -428,3 +428,29 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para de
 [![GitHub forks](https://img.shields.io/github/forks/gugamilani940/gerador-aulas-app?style=social)](https://github.com/gugamilani940/gerador-aulas-app/network)
 
 </div>
+
+# 🧪 Gerador de Aulas Científicas
+
+Um aplicativo mobile para auxiliar professores na criação de aulas dinâmicas e envolventes para disciplinas científicas.
+
+## 📱 Instalação via GitHub
+
+### Opção 1: Download direto do APK
+1. Vá para a seção [Releases](https://github.com/gugamilani940/gerador-aulas-app/releases)
+2. Baixe o arquivo `gerador-aulas-debug.apk`
+3. Instale no seu dispositivo Android
+
+### Opção 2: Clonar e compilar
+```bash
+# Clone o repositório
+git clone https://github.com/gugamilani940/gerador-aulas-app.git
+cd gerador-aulas-app
+
+# Execute o script de instalação
+# No Linux/Mac:
+chmod +x install.sh
+./install.sh
+
+# No Windows:
+install.bat
+```
